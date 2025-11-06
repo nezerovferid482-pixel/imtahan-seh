@@ -3,188 +3,368 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Educentr Təhsil Mərkəzi – İmtahan Nəticələri</title>
+  <title>Educentr Təhsil Mərkəzi</title>
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: "Segoe UI", sans-serif;
-      background: linear-gradient(135deg, #e0f0ff, #ffffff);
-      margin: 0; padding: 0;
-      color: #004080;
+      font-family: Arial, sans-serif;
+      background-color: #f5f8ff;
+      text-align: center;
     }
     header {
-      text-align: center;
-      padding: 25px;
-      background: #007bff;
+      background-color: #007bff;
       color: white;
+      padding: 15px 0;
     }
-    header h1 { margin: 0; }
-    header p { margin: 5px 0 0; font-style: italic; }
     nav {
-      text-align: center;
-      background: #f1f7ff;
+      background-color: #e9f0ff;
       padding: 10px;
     }
     nav button {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      margin: 0 8px;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-    section { display: none; padding: 20px; }
-    .active { display: block; }
-    input {
-      padding: 8px;
       margin: 5px;
+      padding: 10px 25px;
       border: 1px solid #007bff;
-      border-radius: 4px;
-    }
-    button.action {
-      background: #004080;
-      color: white;
-      padding: 8px 16px;
-      border: none;
+      background-color: white;
+      color: #007bff;
       border-radius: 5px;
       cursor: pointer;
+      font-weight: bold;
     }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 15px;
-    }
-    table, th, td {
-      border: 1px solid #007bff;
-      padding: 8px;
-    }
-    th {
-      background: #007bff;
+    nav button.active {
+      background-color: #007bff;
       color: white;
+    }
+    section {
+      display: none;
+      padding: 25px;
+    }
+    section.active {
+      display: block;
+    }
+    input, button {
+      padding: 10px;
+      margin: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    footer {
+      margin-top: 30px;
+      padding: 15px;
+      font-size: 14px;
+      color: #555;
+      border-top: 1px solid #ccc;
+    }
+    .result-box {
+      margin-top: 20px;
+      background: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      padding: 15px;
+      display: inline-block;
+      min-width: 250px;
     }
   </style>
 </head>
+
 <body>
+
   <header>
-    <h1>Educentr Təhsil Mərkəzi – İmtahan Nəticəsi</h1>
+    <h1>Educentr Təhsil Mərkəzi</h1>
     <p>Elm sənin yolundur</p>
   </header>
 
   <nav>
-    <button onclick="showTab('imtahan')">İmtahan nəticələri</button>
-    <button onclick="showTab('admin')">Admin panel</button>
+    <button id="tabStudent" class="active" onclick="showTab('student')">Şagird</button>
+    <button id="tabAdmin" onclick="adminLogin()">Admin</button>
   </nav>
 
-  <section id="imtahan" class="active">
-    <h2>İmtahan nəticəsini yoxla</h2>
-    <input type="text" id="searchId" placeholder="Şagird ID daxil et">
-    <button class="action" onclick="searchResult()">Axtar</button>
-    <div id="result"></div>
+  <!-- 🔹 Şagird bölməsi -->
+  <section id="student" class="active">
+    <h2>İmtahan nəticələri</h2>
+    <input type="text" id="studentId" placeholder="Şagird ID daxil et">
+    <button onclick="searchResult()">Axtar</button>
+    <div id="resultArea"></div>
   </section>
 
+  <!-- 🔹 Admin paneli -->
   <section id="admin">
     <h2>Admin panel</h2>
-    <div id="adminLogin">
-      <input type="password" id="adminCode" placeholder="Admin kodu (4083)">
-      <button class="action" onclick="loginAdmin()">Daxil ol</button>
-    </div>
-
-    <div id="adminPanel" style="display:none;">
-      <h3>Yeni nəticə əlavə et</h3>
-      <input id="id" placeholder="ID">
-      <input id="adsoyad" placeholder="Ad Soyad">
-      <input id="sinif" placeholder="Sinif">
-      <input id="fenn" placeholder="Fənn">
-      <input id="bolme" placeholder="Bölmə">
-      <input id="faiz" placeholder="Faiz">
-      <input id="tarix" placeholder="Tarix (gg.aa.iiii)">
-      <button class="action" onclick="addResult()">Əlavə et</button>
-
-      <h3>Bütün nəticələr</h3>
-      <div id="allResults"></div>
-    </div>
+    <h3>Yeni nəticə əlavə et</h3>
+    <input type="text" id="id" placeholder="ID">
+    <input type="text" id="name" placeholder="Ad Soyad">
+    <input type="text" id="sinif" placeholder="Sinif">
+    <input type="text" id="fenn" placeholder="Fənn">
+    <input type="text" id="dil" placeholder="Dil">
+    <input type="number" id="faiz" placeholder="Faiz">
+    <br>
+    <button onclick="addResult()">Əlavə et</button>
   </section>
 
+  <footer>© Educentr Təhsil Mərkəzi — Elm sənin yolundur</footer>
+
+  <script>
+    // 🔹 JsonBin məlumatları
+    const ACCESS_KEY = "$2a$10$igT8EnkHr1nerkjpkiG59OjNQB2Yedm.ltI6f6UBCnQ8X6BiqH.uS";
+    const COLLECTION_ID = "690d0ee7ae596e708f4930d6";
+    const ADMIN_CODE = "4083"; // Admin kodu
+
+    function showTab(tab) {
+      document.querySelectorAll("section").forEach(sec => sec.classList.remove("active"));
+      document.getElementById(tab).classList.add("active");
+      document.querySelectorAll("nav button").forEach(btn => btn.classList.remove("active"));
+      document.getElementById("tab" + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add("active");
+    }
+
+    function adminLogin() {
+      const code = prompt("Admin kodunu daxil et:");
+      if (code === ADMIN_CODE) {
+        showTab("admin");
+      } else {
+        alert("Səhv kod!");
+      }
+    }
+
+    async function addResult() {
+      const id = document.getElementById("id").value.trim();
+      const name = document.getElementById("name").value.trim();
+      const sinif = document.getElementById("sinif").value.trim();
+      const fenn = document.getElementById("fenn").value.trim();
+      const dil = document.getElementById("dil").value.trim();
+      const faiz = document.getElementById("faiz").value.trim();
+
+      if (!id || !name || !sinif || !fenn || !dil || !faiz) {
+        alert("Zəhmət olmasa bütün xanaları doldurun!");
+        return;
+      }
+
+      const newResult = { id, name, sinif, fenn, dil, faiz };
+
+      try {
+        const getRes = await fetch(https://api.jsonbin.io/v3/b/${COLLECTION_ID}/latest, {
+          headers: { "X-Access-Key": ACCESS_KEY }
+        });
+        const data = await getRes.json();
+        const oldResults = data.record.neticeler || [];
+
+        oldResults.push(newResult);
+
+        const res = await fetch(https://api.jsonbin.io/v3/b/${COLLECTION_ID}, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Access-Key": ACCESS_KEY
+          },
+          body: JSON.stringify({ neticeler: oldResults })
+        });
+
+        if (res.ok) alert("Nəticə əlavə olundu!");
+        else alert("Xəta baş verdi!");
+      } catch (err) {
+        alert("Bağlantı xətası!");
+      }
+    }
+
+    async function searchResult() {
+      const id = document.getElementById("studentId").value.trim();
+      if (!id) return alert("ID daxil edin!");
+
+      try {
+        const res = await fetch(https://api.jsonbin.io/v3/b/${COLLECTION_ID}/latest, {
+          headers: { "X-Access-Key": ACCESS_KEY }
+        });
+        const data = await res.json();
+        const list = data.record.neticeler || [];
+        const found = list.find(item => item.id === id);
+
+        const resultArea = document.getElementById("resultArea");
+        if (found) {
+          resultArea.innerHTML = `
+            <div class="result-box">
+              <p><b>Ad Soyad:</b> ${found.name}</p>
+              <p><b>Sinif:</b> ${found.sinif}</p>
+              <p><b>Fənn:</b> ${found.fenn}</p>
+              <p><b>Dil:</b> ${found.dil}</p>
+              <p><b>Faiz:</b> ${found.faiz}%</p>
+            </div>
+          `;
+        } else {
+          resultArea.innerHTML = <p style="color:red;">Bu ID ilə nəticə tapılmadı.</p>;
+        }
+      } catch (err) {
+        alert("Bağlantı xətası!");
+      }
+    }
+  </script>
 <script>
-const API_URL = "https://api.jsonbin.io/v3/b/690d0ee7ae596e708f4930d6";
-const API_KEY = "$2a$10$igT8EnkHr1nerkjpkiG59OjNQB2Yedm.ltI6f6UBCnQ8X6BiqH.uS.";
+document.addEventListener("DOMContentLoaded", () => {
+  const studentSection = document.getElementById("student");
+  const adminSection = document.getElementById("admin");
+  const studentTab = document.getElementById("tabStudent");
+  const adminTab = document.getElementById("tabAdmin");
 
-function showTab(tab) {
-  document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
-  document.getElementById(tab).classList.add("active");
-}
+  // Əvvəlcə yalnız şagird hissəsi aktivdir
+  studentSection.style.display = "block";
+  adminSection.style.display = "none";
 
-async function fetchData() {
-  const res = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY }});
-  const data = await res.json();
-  return data.record || [];
-}
-
-async function saveData(newData) {
-  await fetch(API_URL, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
-    body: JSON.stringify(newData)
+  // Şagird tabına klik
+  studentTab.addEventListener("click", () => {
+    studentSection.style.display = "block";
+    adminSection.style.display = "none";
+    studentTab.classList.add("active");
+    adminTab.classList.remove("active");
   });
-}
 
-async function searchResult() {
-  const id = document.getElementById("searchId").value.trim();
-  const div = document.getElementById("result");
-  div.innerHTML = "Yüklənir...";
-  const data = await fetchData();
-  const s = data.find(d => d.id === id);
-  div.innerHTML = s ? `
-    <table>
-      <tr><th>Ad Soyad</th><td>${s.adsoyad}</td></tr>
-      <tr><th>Sinif</th><td>${s.sinif}</td></tr>
-      <tr><th>Fənn</th><td>${s.fenn}</td></tr>
-      <tr><th>Bölmə</th><td>${s.bolme}</td></tr>
-      <tr><th>Faiz</th><td>${s.faiz}%</td></tr>
-      <tr><th>Tarix</th><td>${s.tarix}</td></tr>
-    </table>
-  ` : "<p style='color:red;'>Bu ID üçün nəticə tapılmadı.</p>";
-}
-
-function loginAdmin() {
-  const code = document.getElementById("adminCode").value;
-  if (code === "4083") {
-    document.getElementById("adminLogin").style.display = "none";
-    document.getElementById("adminPanel").style.display = "block";
-    loadAllResults();
-  } else {
-    alert("Səhv admin kodu!");
-  }
-}
-
-async function loadAllResults() {
-  const data = await fetchData();
-  const div = document.getElementById("allResults");
-  div.innerHTML = "<table><tr><th>ID</th><th>Ad Soyad</th><th>Faiz</th><th>Əməliyyat</th></tr>" +
-    data.map(d => `<tr>
-      <td>${d.id}</td><td>${d.adsoyad}</td><td>${d.faiz}%</td>
-      <td><button onclick="deleteResult('${d.id}')">Sil</button></td>
-    </tr>`).join("") + "</table>";
-}
-
-async function addResult() {
-  const fields = ["id","adsoyad","sinif","fenn","bolme","faiz","tarix"];
-  const newEntry = {};
-  fields.forEach(f => newEntry[f] = document.getElementById(f).value);
-  const data = await fetchData();
-  data.push(newEntry);
-  await saveData(data);
-  alert("Nəticə əlavə olundu!");
-  loadAllResults();
-}
-
-async function deleteResult(id) {
-  const data = await fetchData();
-  const filtered = data.filter(d => d.id !== id);
-  await saveData(filtered);
-  alert("Silindi!");
-  loadAllResults();
-}
+  // Admin tabına klik (login kodu ilə)
+  adminTab.addEventListener("click", () => {
+    const code = prompt("Admin kodunu daxil et:");
+    if (code === "4083") {
+      adminSection.style.display = "block";
+      studentSection.style.display = "none";
+      adminTab.classList.add("active");
+      studentTab.classList.remove("active");
+    } else {
+      alert("Səhv kod!");
+    }
+  });
+});
 </script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const studentSection = document.getElementById("student");
+  const adminSection = document.getElementById("admin");
+  const studentTab = document.getElementById("tabStudent");
+  const adminTab = document.getElementById("tabAdmin");
+  const ADMIN_CODE = "4083";
+
+  // ilk görünən hissə: şagird
+  studentSection.style.display = "block";
+  adminSection.style.display = "none";
+
+  // Şagird tabına klik
+  studentTab.addEventListener("click", () => {
+    studentSection.style.display = "block";
+    adminSection.style.display = "none";
+    studentTab.classList.add("active");
+    adminTab.classList.remove("active");
+  });
+
+  // Admin tabına klik
+  adminTab.addEventListener("click", () => {
+    const code = prompt("Admin kodunu daxil et:");
+    if (code === ADMIN_CODE) {
+      adminSection.style.display = "block";
+      studentSection.style.display = "none";
+      adminTab.classList.add("active");
+      studentTab.classList.remove("active");
+    } else {
+      alert("Səhv kod!");
+    }
+  });
+
+  // 🔹 Əlavə et düyməsi
+  document.querySelector("button[onclick='addResult()']").addEventListener("click", addResult);
+  
+  // 🔹 Yoxla düyməsi
+  document.querySelector("button[onclick='searchResult()']").addEventListener("click", searchResult);
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const studentSection = document.getElementById("student");
+  const adminSection = document.getElementById("admin");
+  const studentTab = document.getElementById("tabStudent");
+  const adminTab = document.getElementById("tabAdmin");
+  const resultArea = document.getElementById("resultArea");
+  const ADMIN_CODE = "4083";
+
+  // Müvəqqəti yaddaş (JSONBin əvəzi üçün)
+  let results = [];
+
+  // İlk görünən hissə: şagird
+  studentSection.style.display = "block";
+  adminSection.style.display = "none";
+
+  // 🔹 Tab keçidi
+  studentTab.addEventListener("click", () => {
+    studentSection.style.display = "block";
+    adminSection.style.display = "none";
+    studentTab.classList.add("active");
+    adminTab.classList.remove("active");
+  });
+
+  adminTab.addEventListener("click", () => {
+    const code = prompt("Admin kodunu daxil et:");
+    if (code === ADMIN_CODE) {
+      adminSection.style.display = "block";
+      studentSection.style.display = "none";
+      adminTab.classList.add("active");
+      studentTab.classList.remove("active");
+    } else {
+      alert("Səhv kod!");
+    }
+  });
+
+  // 🔹 Əlavə et funksiyası
+  window.addResult = function() {
+    const id = document.getElementById("id").value.trim();
+    const name = document.getElementById("name").value.trim();
+    const sinif = document.getElementById("sinif").value.trim();
+    const fenn = document.getElementById("fenn").value.trim();
+    const dil = document.getElementById("dil").value.trim();
+    const faiz = document.getElementById("faiz").value.trim();
+
+    if (!id || !name || !sinif || !fenn || !dil || !faiz) {
+      alert("Zəhmət olmasa bütün xanaları doldurun!");
+      return;
+    }
+
+    const newResult = { id, name, sinif, fenn, dil, faiz };
+    results.push(newResult);
+
+    alert("Nəticə uğurla əlavə olundu!");
+    document.getElementById("id").value = "";
+    document.getElementById("name").value = "";
+    document.getElementById("sinif").value = "";
+    document.getElementById("fenn").value = "";
+    document.getElementById("dil").value = "";
+    document.getElementById("faiz").value = "";
+  };
+
+  // 🔹 Yoxla funksiyası
+  window.searchResult = function() {
+    const id = document.getElementById("studentId").value.trim();
+    if (!id) {
+      alert("ID daxil edin!");
+      return;
+    }
+
+    const found = results.find(r => r.id === id);
+    if (found) {
+      resultArea.innerHTML = `
+        <div class="result-box">
+          <p><b>Ad Soyad:</b> ${found.name}</p>
+          <p><b>Sinif:</b> ${found.sinif}</p>
+          <p><b>Fənn:</b> ${found.fenn}</p>
+          <p><b>Dil:</b> ${found.dil}</p>
+          <p><b>Faiz:</b> ${found.faiz}%</p>
+        </div>
+      `;
+    } else {
+      resultArea.innerHTML = <p style="color:red;">Bu ID ilə nəticə tapılmadı.</p>;
+    }
+  };
+});
+</script>
+
 </body>
 </html>
+   
