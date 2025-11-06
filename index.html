@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Educentr Təhsil Mərkəzi – İmtahan Nəticələri</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #e0f0ff, #ffffff);
+      margin: 0; padding: 0;
+      color: #004080;
+    }
+    header {
+      text-align: center;
+      padding: 25px;
+      background: #007bff;
+      color: white;
+    }
+    header h1 { margin: 0; }
+    header p { margin: 5px 0 0; font-style: italic; }
+    nav {
+      text-align: center;
+      background: #f1f7ff;
+      padding: 10px;
+    }
+    nav button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 0 8px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    section { display: none; padding: 20px; }
+    .active { display: block; }
+    input {
+      padding: 8px;
+      margin: 5px;
+      border: 1px solid #007bff;
+      border-radius: 4px;
+    }
+    button.action {
+      background: #004080;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 15px;
+    }
+    table, th, td {
+      border: 1px solid #007bff;
+      padding: 8px;
+    }
+    th {
+      background: #007bff;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Educentr Təhsil Mərkəzi – İmtahan Nəticəsi</h1>
+    <p>Elm sənin yolundur</p>
+  </header>
+
+  <nav>
+    <button onclick="showTab('imtahan')">İmtahan nəticələri</button>
+    <button onclick="showTab('admin')">Admin panel</button>
+  </nav>
+
+  <section id="imtahan" class="active">
+    <h2>İmtahan nəticəsini yoxla</h2>
+    <input type="text" id="searchId" placeholder="Şagird ID daxil et">
+    <button class="action" onclick="searchResult()">Axtar</button>
+    <div id="result"></div>
+  </section>
+
+  <section id="admin">
+    <h2>Admin panel</h2>
+    <div id="adminLogin">
+      <input type="password" id="adminCode" placeholder="Admin kodu (4083)">
+      <button class="action" onclick="loginAdmin()">Daxil ol</button>
+    </div>
+
+    <div id="adminPanel" style="display:none;">
+      <h3>Yeni nəticə əlavə et</h3>
+      <input id="id" placeholder="ID">
+      <input id="adsoyad" placeholder="Ad Soyad">
+      <input id="sinif" placeholder="Sinif">
+      <input id="fenn" placeholder="Fənn">
+      <input id="bolme" placeholder="Bölmə">
+      <input id="faiz" placeholder="Faiz">
+      <input id="tarix" placeholder="Tarix (gg.aa.iiii)">
+      <button class="action" onclick="addResult()">Əlavə et</button>
+
+      <h3>Bütün nəticələr</h3>
+      <div id="allResults"></div>
+    </div>
+  </section>
+
+<script>
+const API_URL = "https://api.jsonbin.io/v3/b/690d0ee7ae596e708f4930d6";
+const API_KEY = "$2a$10$MmrERb3ARvTPlNl.qEb6lONEFbQSwgQ4XVMgqsRt8tl3u9oGX8Y1.";
+
+function showTab(tab) {
+  document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
+  document.getElementById(tab).classList.add("active");
+}
+
+async function fetchData() {
+  const res = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY }});
+  const data = await res.json();
+  return data.record || [];
+}
+
+async function saveData(newData) {
+  await fetch(API_URL, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
+    body: JSON.stringify(newData)
+  });
+}
+
+async function searchResult() {
+  const id = document.getElementById("searchId").value.trim();
+  const div = document.getElementById("result");
+  div.innerHTML = "Yüklənir...";
+  const data = await fetchData();
+  const s = data.find(d => d.id === id);
+  div.innerHTML = s ? `
+    <table>
+      <tr><th>Ad Soyad</th><td>${s.adsoyad}</td></tr>
+      <tr><th>Sinif</th><td>${s.sinif}</td></tr>
+      <tr><th>Fənn</th><td>${s.fenn}</td></tr>
+      <tr><th>Bölmə</th><td>${s.bolme}</td></tr>
+      <tr><th>Faiz</th><td>${s.faiz}%</td></tr>
+      <tr><th>Tarix</th><td>${s.tarix}</td></tr>
+    </table>
+  ` : "<p style='color:red;'>Bu ID üçün nəticə tapılmadı.</p>";
+}
+
+function loginAdmin() {
+  const code = document.getElementById("adminCode").value;
+  if (code === "4083") {
+    document.getElementById("adminLogin").style.display = "none";
+    document.getElementById("adminPanel").style.display = "block";
+    loadAllResults();
+  } else {
+    alert("Səhv admin kodu!");
+  }
+}
+
+async function loadAllResults() {
+  const data = await fetchData();
+  const div = document.getElementById("allResults");
+  div.innerHTML = "<table><tr><th>ID</th><th>Ad Soyad</th><th>Faiz</th><th>Əməliyyat</th></tr>" +
+    data.map(d => `<tr>
+      <td>${d.id}</td><td>${d.adsoyad}</td><td>${d.faiz}%</td>
+      <td><button onclick="deleteResult('${d.id}')">Sil</button></td>
+    </tr>`).join("") + "</table>";
+}
+
+async function addResult() {
+  const fields = ["id","adsoyad","sinif","fenn","bolme","faiz","tarix"];
+  const newEntry = {};
+  fields.forEach(f => newEntry[f] = document.getElementById(f).value);
+  const data = await fetchData();
+  data.push(newEntry);
+  await saveData(data);
+  alert("Nəticə əlavə olundu!");
+  loadAllResults();
+}
+
+async function deleteResult(id) {
+  const data = await fetchData();
+  const filtered = data.filter(d => d.id !== id);
+  await saveData(filtered);
+  alert("Silindi!");
+  loadAllResults();
+}
+</script>
+</body>
+</html>
